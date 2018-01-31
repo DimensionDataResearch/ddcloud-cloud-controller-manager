@@ -15,6 +15,10 @@ import (
 
 const providerName string = "ddcloud"
 
+func init() {
+	cloudprovider.RegisterCloudProvider(providerName, NewProvider)
+}
+
 // Config represents the configuration for the Dimension Data cloud controller provider.
 type Config {
 	Region string `yaml:"region"`
@@ -24,12 +28,14 @@ type Config {
 	NetworkDomain `yaml:"network_domain"`
 }
 
+// The Dimension Data cloud controller provider.
 type cloud struct {
 	config Config
 	client *compute.Client
 }
 
-func newCloud(configFile io.Reader) (cloudprovider.Interface, error) {
+// NewProvider creates a new instance of the Dimension Data cloud controller provider.
+func NewProvider(configFile io.Reader) (cloudprovider.Interface, error) {
 	configData, err := ioutil.ReadAll(configFile)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read configuration")
@@ -47,12 +53,6 @@ func newCloud(configFile io.Reader) (cloudprovider.Interface, error) {
 	}
 
 	return cloud, nil
-}
-
-func init() {
-	cloudprovider.RegisterCloudProvider(providerName, func(config io.Reader) (cloudprovider.Interface, error) {
-		return newCloud(config)
-	})
 }
 
 func (cloud *cloud) Initialize(clientBuilder controller.ControllerClientBuilder) {
