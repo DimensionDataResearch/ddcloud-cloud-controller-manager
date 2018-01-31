@@ -1,0 +1,5 @@
+package ddcloud
+
+/*
+ * Placeholder.
+ */
